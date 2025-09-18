@@ -1,4 +1,4 @@
-import { getRecentMintActivities } from '../../lib/logger';
+import { getRecentMintActivities } from '../lib/logger';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {

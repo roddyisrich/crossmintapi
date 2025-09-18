@@ -1,4 +1,4 @@
-import { logMintActivity } from '../../lib/logger';
+import { logMintActivity } from '../lib/logger';
 
 const CROSSMINT_API_KEY = 'sk_production_A52BtotVaZVkE8Pf4Y7d7qAQPt5bpGLpNK2GYEor6Jh6wfP2QjjNTAiMAvok2Uhoee6ervPxDY9ykf13UXjnnCK3jbhq7XdLxfEL5WNfjvsmMUE8E366cGKveQzP5Ek5cmgetAAcfykhv7DhXmZTC688oRaD62dgYrRRFznNkNarr1h4BWL69KkcZ3KZ3ESKanCzqPFF9MQh5h3Qu2LZrUMi';
 const COLLECTION_ID = 'dac34fe9-b480-4140-bed0-73fe01d63d4c';
