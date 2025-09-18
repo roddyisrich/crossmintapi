@@ -1,4 +1,3 @@
-cat > vercel.json << 'EOF'
 {
   "rewrites": [
     {
@@ -20,6 +19,10 @@ cat > vercel.json << 'EOF'
     {
       "source": "/api/recent-mints",
       "destination": "/api/recent-mints"
+    },
+    {
+      "source": "/api/test-mint",
+      "destination": "/api/test-mint"
     },
     {
       "source": "/",
