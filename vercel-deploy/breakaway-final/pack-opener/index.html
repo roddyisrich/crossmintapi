@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breakaway Rush Pack Opener</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="pack-container">
+        <h1>Open Your Card Pack!</h1>
+        <input type="text" id="playerID" placeholder="Enter Player ID" required>
+        <input type="text" id="accessCode" placeholder="Enter Access Code" required>
+        <button onclick="openPack()">BREAK PACK</button>
+    </div>
+    
+    <div id="opening-animation" style="display:none;">
+        <h2>Opening pack...</h2>
+        <div class="spinner">🎴</div>
+        <p>Breaking the seal...</p>
+    </div>
+    
+    <div id="card-reveal" style="display:none;">
+        <h2>You pulled:</h2>
+        <div class="card">
+            <img id="cardImage" src="" alt="Your NFT Card">
+            <h3 id="cardName"></h3>
+            <p id="cardRarity"></p>
+        </div>
+        <p>NFT minted to collection!</p>
+        <button onclick="resetPack()">Open Another Pack</button>
+    </div>
+
+    <script src="access-codes.js"></script>
+    <script src="cards.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

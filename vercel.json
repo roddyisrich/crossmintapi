@@ -1,0 +1,24 @@
+{
+  "rewrites": [
+    {
+      "source": "/pack-opener",
+      "destination": "/pack-opener.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin.html"
+    },
+    {
+      "source": "/dfs",
+      "destination": "/dfs.html"
+    },
+    {
+      "source": "/cards",
+      "destination": "/api/cards"
+    },
+    {
+      "source": "/",
+      "destination": "/index.html"
+    }
+  ]
+}

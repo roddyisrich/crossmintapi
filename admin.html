@@ -17,7 +17,7 @@
         }
         
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background: rgba(255,255,255,0.1);
             backdrop-filter: blur(20px);
@@ -25,6 +25,13 @@
             border-radius: 20px;
             padding: 40px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        /* Login Screen */
+        .login-container {
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
         }
         
         h1 {
@@ -142,7 +149,7 @@
             padding: 15px;
             margin-top: 15px;
             font-family: monospace;
-            max-height: 200px;
+            max-height: 300px;
             overflow-y: auto;
         }
         
@@ -177,7 +184,18 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Login Screen -->
+    <div class="container login-container" id="login-container">
+        <h1>ADMIN LOGIN</h1>
+        <div class="form-group">
+            <input type="password" id="adminPassword" placeholder="Enter Admin Password">
+        </div>
+        <button class="btn" onclick="login()">LOGIN</button>
+        <div id="loginError" class="error-box hidden"></div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div class="container hidden" id="admin-panel">
         <h1>ADMIN PANEL</h1>
         
         <!-- Stats Section -->
@@ -198,6 +216,7 @@
                 </div>
             </div>
             <button class="btn btn-info" onclick="refreshStats()">🔄 Refresh Stats</button>
+            <button class="btn btn-danger" onclick="logout()" style="float: right;">🚪 Logout</button>
         </div>
         
         <!-- Code Generation Section -->
@@ -234,38 +253,65 @@
             <div id="codeDisplay" class="code-list hidden"></div>
         </div>
         
-        <!-- Player ID Lookup Section -->
-        <div class="section">
-            <h2>👤 Player Lookup</h2>
-            <div class="form-group">
-                <label for="playerSearch">Search Player ID:</label>
-                <input type="text" id="playerSearch" placeholder="Enter Player ID">
-                <button class="btn btn-info" onclick="lookupPlayer()" style="margin-top: 10px;">🔍 Search</button>
-            </div>
-            <div id="playerResults" class="hidden"></div>
-        </div>
-        
         <!-- Status Messages -->
         <div id="statusMessage" class="hidden"></div>
     </div>
 
     <script>
+        // Admin authentication
+        const ADMIN_PASSWORD = "RoddyisRich"; // Change this to your secure password
+        
+        function login() {
+            const password = document.getElementById('adminPassword').value;
+            const loginError = document.getElementById('loginError');
+            
+            if (password === ADMIN_PASSWORD) {
+                sessionStorage.setItem('adminAuthenticated', 'true');
+                document.getElementById('login-container').classList.add('hidden');
+                document.getElementById('admin-panel').classList.remove('hidden');
+                loginError.classList.add('hidden');
+                refreshStats();
+            } else {
+                loginError.textContent = 'Invalid password!';
+                loginError.classList.remove('hidden');
+                document.getElementById('adminPassword').value = '';
+            }
+        }
+        
+        function logout() {
+            sessionStorage.removeItem('adminAuthenticated');
+            document.getElementById('admin-panel').classList.add('hidden');
+            document.getElementById('login-container').classList.remove('hidden');
+            document.getElementById('adminPassword').value = '';
+        }
+        
+        function checkAuth() {
+            if (sessionStorage.getItem('adminAuthenticated') === 'true') {
+                document.getElementById('login-container').classList.add('hidden');
+                document.getElementById('admin-panel').classList.remove('hidden');
+                refreshStats();
+            }
+        }
+        
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
-            refreshStats();
+            checkAuth();
+            
+            // Enter key support
+            document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    login();
+                }
+            });
         });
 
+        // Simplified API Functions - using ONLY the same endpoints as pack opener
         async function refreshStats() {
-            try {
-                const response = await fetch('/api/access-codes');
-                const data = await response.json();
-                
-                document.getElementById('validCodesCount').textContent = data.stats.total;
-                document.getElementById('usedCodesCount').textContent = data.stats.used;
-                document.getElementById('remainingCodesCount').textContent = data.stats.remaining;
-            } catch (error) {
-                showMessage('Error loading stats: ' + error.message, 'error');
-            }
+            // Since we only have basic endpoints, we'll show a simple message
+            document.getElementById('validCodesCount').textContent = '---';
+            document.getElementById('usedCodesCount').textContent = '---';
+            document.getElementById('remainingCodesCount').textContent = '---';
+            showMessage('Stats require extended API. Use "View All Codes" to see current codes.', 'error');
         }
 
         async function generateCodes() {
@@ -278,26 +324,36 @@
             }
             
             try {
-                const response = await fetch('/api/access-codes', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'generate', quantity, prefix })
-                });
+                const codes = [];
+                for (let i = 0; i < quantity; i++) {
+                    const timestamp = new Date().toISOString().slice(0,10).replace(/-/g,'');
+                    const random = Math.random().toString(36).substring(2,8).toUpperCase();
+                    const code = `${prefix}-${timestamp}-${random}`;
+                    
+                    // Add each code using the same endpoint as pack opener
+                    const response = await fetch('/api/access-codes', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'add', code })
+                    });
+                    
+                    if (response.ok) {
+                        codes.push(code);
+                    }
+                }
                 
-                const data = await response.json();
-                
-                if (data.success) {
+                if (codes.length > 0) {
                     const codeDisplay = document.getElementById('generatedCodes');
-                    codeDisplay.innerHTML = `<strong>Generated ${quantity} new codes:</strong><br><br>` + 
-                        data.newCodes.map(code => `<div style="margin: 5px 0; padding: 5px; background: rgba(76,175,80,0.2); border-radius: 4px;">${code}</div>`).join('');
+                    codeDisplay.innerHTML = `<strong>Generated ${codes.length} new codes:</strong><br><br>` + 
+                        codes.map(code => `<div style="margin: 5px 0; padding: 5px; background: rgba(76,175,80,0.2); border-radius: 4px; font-family: monospace;">${code}</div>`).join('');
                     codeDisplay.classList.remove('hidden');
                     
-                    showMessage(data.message, 'success');
-                    refreshStats();
+                    showMessage(`Successfully generated ${codes.length} codes!`, 'success');
                 } else {
-                    showMessage('Error generating codes', 'error');
+                    showMessage('Failed to generate codes. Check your API.', 'error');
                 }
             } catch (error) {
+                console.error('Generate error:', error);
                 showMessage('Error: ' + error.message, 'error');
             }
         }
@@ -317,124 +373,42 @@
                     body: JSON.stringify({ action: 'add', code })
                 });
                 
-                const data = await response.json();
-                
-                if (data.success) {
+                if (response.ok) {
+                    const data = await response.json();
                     document.getElementById('manualCode').value = '';
-                    showMessage(data.message, 'success');
-                    refreshStats();
+                    showMessage('Code added successfully!', 'success');
                 } else {
-                    showMessage('Error: ' + data.error, 'error');
+                    showMessage('Error adding code - may already exist', 'error');
                 }
             } catch (error) {
+                console.error('Add code error:', error);
                 showMessage('Error: ' + error.message, 'error');
             }
         }
 
         async function viewAllCodes() {
-            try {
-                const response = await fetch('/api/access-codes');
-                const data = await response.json();
-                
-                const codeDisplay = document.getElementById('codeDisplay');
-                codeDisplay.innerHTML = `<strong>All Valid Codes (${data.validCodes.length}):</strong><br><br>` + 
-                    data.validCodes.map(code => {
-                        const isUsed = data.usedCodes.includes(code);
-                        const status = isUsed ? '❌ USED' : '✅ AVAILABLE';
-                        const bgColor = isUsed ? 'rgba(244,67,54,0.2)' : 'rgba(76,175,80,0.2)';
-                        return `<div style="margin: 5px 0; padding: 8px; background: ${bgColor}; border-radius: 4px; display: flex; justify-content: space-between;">
-                            <span>${code}</span>
-                            <span style="font-weight: bold;">${status}</span>
-                        </div>`;
-                    }).join('');
-                codeDisplay.classList.remove('hidden');
-            } catch (error) {
-                showMessage('Error loading codes: ' + error.message, 'error');
-            }
+            showMessage('This feature requires extended API endpoints. Currently only basic validation is available.', 'error');
+            document.getElementById('codeDisplay').innerHTML = 
+                '<strong>Available API endpoints:</strong><br><br>' +
+                '✅ GET /api/access-codes?check=CODE (pack opener uses this)<br>' +
+                '✅ POST /api/access-codes with {action: "use", code} (pack opener uses this)<br>' +
+                '✅ POST /api/access-codes with {action: "add", code} (admin can add codes)<br><br>' +
+                '❌ Missing: List all codes endpoint<br>' +
+                '❌ Missing: Stats endpoint<br><br>' +
+                'You can test codes in the pack opener to verify they work.';
+            document.getElementById('codeDisplay').classList.remove('hidden');
         }
 
         async function viewUsedCodes() {
-            try {
-                const response = await fetch('/api/access-codes');
-                const data = await response.json();
-                
-                const codeDisplay = document.getElementById('codeDisplay');
-                if (data.usedCodes.length === 0) {
-                    codeDisplay.innerHTML = '<strong>No codes have been used yet.</strong>';
-                } else {
-                    codeDisplay.innerHTML = `<strong>Used Codes (${data.usedCodes.length}):</strong><br><br>` + 
-                        data.usedCodes.map(code => `<div style="margin: 5px 0; padding: 8px; background: rgba(244,67,54,0.2); border-radius: 4px;">${code}</div>`).join('');
-                }
-                codeDisplay.classList.remove('hidden');
-            } catch (error) {
-                showMessage('Error loading used codes: ' + error.message, 'error');
-            }
+            showMessage('This feature requires extended API endpoints.', 'error');
         }
 
         async function clearUsedCodes() {
-            if (confirm('Are you sure you want to clear all used codes? This will make them available again.')) {
-                try {
-                    const response = await fetch('/api/access-codes', {
-                        method: 'DELETE',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ action: 'clearUsed' })
-                    });
-                    
-                    const data = await response.json();
-                    showMessage(data.message, 'success');
-                    refreshStats();
-                    document.getElementById('codeDisplay').classList.add('hidden');
-                } catch (error) {
-                    showMessage('Error: ' + error.message, 'error');
-                }
-            }
+            showMessage('This feature requires extended API endpoints.', 'error');
         }
 
         async function clearAllCodes() {
-            if (confirm('⚠️ WARNING: This will delete ALL codes (valid and used). Are you sure?')) {
-                try {
-                    const response = await fetch('/api/access-codes', {
-                        method: 'DELETE',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ action: 'clearAll' })
-                    });
-                    
-                    const data = await response.json();
-                    showMessage(data.message, 'success');
-                    refreshStats();
-                    document.getElementById('codeDisplay').classList.add('hidden');
-                    document.getElementById('generatedCodes').classList.add('hidden');
-                } catch (error) {
-                    showMessage('Error: ' + error.message, 'error');
-                }
-            }
-        }
-        
-        function lookupPlayer() {
-            const playerID = document.getElementById('playerSearch').value.trim();
-            
-            if (!playerID) {
-                showMessage('Please enter a Player ID', 'error');
-                return;
-            }
-            
-            // For now, this is a mock lookup since we don't have a real database
-            // In production, this would query your actual logging system
-            const playerResults = document.getElementById('playerResults');
-            playerResults.innerHTML = `
-                <div style="background: rgba(33,150,243,0.2); border: 1px solid rgba(33,150,243,0.3); border-radius: 8px; padding: 15px; margin-top: 15px;">
-                    <strong>Player Lookup Results for: ${playerID}</strong><br><br>
-                    <div style="color: rgba(255,255,255,0.8);">
-                        📝 Note: This is a demo lookup. In production, this would show:<br>
-                        • Cards pulled by this player<br>
-                        • Codes used by this player<br>
-                        • Mint timestamps<br>
-                        • NFT IDs generated<br><br>
-                        Check your Vercel function logs for actual player activity.
-                    </div>
-                </div>
-            `;
-            playerResults.classList.remove('hidden');
+            showMessage('This feature requires extended API endpoints.', 'error');
         }
         
         function showMessage(message, type) {

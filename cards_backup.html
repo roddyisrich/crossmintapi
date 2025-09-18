@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Breakaway Rush - Card Gallery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(135deg, #2c3e50, #1a252f);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      font-size: 2rem;
+      text-shadow: 0 0 15px rgba(255,255,255,0.3);
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 25px;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    /* Cards with no container */
+    .gallery img {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .gallery img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 15px 40px rgba(52,152,219,0.8); /* blue glow */
+    }
+
+    .back-button {
+      margin-top: 40px;
+      text-decoration: none;
+      font-size: 1.2rem;
+      color: white;
+      padding: 15px 35px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #2980b9, #1f618d);
+      box-shadow: 0 0 20px rgba(52,152,219,0.6);
+      transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+      box-shadow: 0 0 35px rgba(52,152,219,0.9);
+      transform: translateY(-4px);
+    }
+  </style>
+</head>
+<body>
+  <h1>Card Gallery</h1>
+  <div class="gallery">
+    <!-- Replace these with your card image URLs -->
+    <img src="https://via.placeholder.com/300x420.png?text=Card+1" alt="Card 1">
+    <img src="https://via.placeholder.com/300x420.png?text=Card+2" alt="Card 2">
+    <img src="https://via.placeholder.com/300x420.png?text=Card+3" alt="Card 3">
+  </div>
+  
+  <a href="/" class="back-button">⬅ Back to Home</a>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Breakaway Rush - Official Trading Cards</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: 
+                radial-gradient(ellipse at 25% 25%, rgba(220,220,220,0.4) 0%, transparent 60%),
+                radial-gradient(ellipse at 75% 75%, rgba(192,192,192,0.3) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 10%, rgba(255,255,255,0.2) 0%, transparent 50%),
+                linear-gradient(135deg, 
+                    #2c3e50 0%, 
+                    #34495e 25%, 
+                    #2c3e50 50%, 
+                    #1a252f 75%, 
+                    #2c3e50 100%
+                );
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        .logo {
+            width: 280px;
+            margin-bottom: 60px;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 60px;
+        }
+        
+        .nav-button {
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+            padding: 22px 45px;
+            border: none;
+            border-radius: 18px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            transition: all 0.5s ease;
+        }
+        
+        /* Open Packs - Red */
+        .nav-button.primary {
+            background: linear-gradient(135deg, #e74c3c, #a93226);
+            color: white;
+        }
+        .nav-button.primary:hover {
+            box-shadow: 0 0 25px rgba(231, 76, 60, 0.7);
+            transform: translateY(-6px);
+        }
+
+        /* Card Gallery - Blue */
+        .nav-button.secondary {
+            background: linear-gradient(135deg, #007bff, #004085);
+            color: white;
+        }
+        .nav-button.secondary:hover {
+            box-shadow: 0 0 25px rgba(0, 123, 255, 0.7);
+            transform: translateY(-6px);
+        }
+
+        /* DFS Fantasy - Purple with lime green glow */
+        .nav-button:not(.primary):not(.secondary) {
+            background: linear-gradient(135deg, #8e44ad, #663399);
+            color: white;
+        }
+        .nav-button:not(.primary):not(.secondary):hover {
+            box-shadow: 0 0 25px rgba(50, 205, 50, 0.8);
+            transform: translateY(-6px);
+        }
+        
+        .features {
+            margin-top: 60px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            width: 100%;
+        }
+        
+        .feature-card {
+            background: rgba(255,255,255,0.1);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .feature-card h3 {
+            font-family: 'Orbitron', monospace;
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+        
+        .feature-card p {
+            color: rgba(255,255,255,0.85);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://red-late-lemming-903.mypinata.cloud/ipfs/bafybeigquaf3vsb3r5m2xavgygbrerl7ggje2zmqqqulanhdaaxflvutva" alt="Breakaway Rush Logo" class="logo">
+        
+        <div class="nav-buttons">
+            <a href="/pack-opener" class="nav-button primary">OPEN PACKS</a>
+            <a href="/cards" class="nav-button secondary">CARD GALLERY</a>
+            <a href="/dfs" class="nav-button">DFS FANTASY</a>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <h3>COLLECT</h3>
+                <p>Collect cards across 4 different tiers with unique powers and multipliers.<br><br>
+                <strong>Tier 1:</strong> 8 per player<br>
+                <strong>Tier 2:</strong> 7 per player<br>
+                <strong>Tier 3:</strong> 3 per player<br>
+                <strong>Tier 4:</strong> 2 per player<br><br>
+                Supply is limited — strategy is everything.</p>
+            </div>
+            <div class="feature-card">
+                <h3>FANTASY</h3>
+                <p>Use your cards to compete in DFS-style fantasy matchups. Multipliers and rarity tiers boost your score.<br><br>
+                Climb the leaderboard, unlock bonuses, and play for real prizes.</p>
+            </div>
+            <div class="feature-card">
+                <h3>TCG</h3>
+                <p>Every card is also playable in our upcoming trading card game.<br><br>
+                <em>Coming soon!</em><br>
+                Breakaway Rush cards have real-world utility built in.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

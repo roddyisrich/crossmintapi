@@ -208,7 +208,7 @@ export default async function handler(req, res) {
               
               return `
                 <div class="card-container ${availabilityClass}">
-                    <img src="${template.metadata.image}" alt="${template.metadata.name}" loading="lazy" />
+     <img src="${template.metadata.image}" alt="${template.metadata.name}" loading="lazy" />
                     <div class="card-info">
                         <div class="card-name">${template.metadata.name}</div>
                         <div class="card-stats">Power: ${power} • ${position}</div>
