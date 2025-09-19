@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/*.js": {
+      "runtime": "@vercel/node"
+    }
+  },
   "rewrites": [
     {
       "source": "/pack-opener",
@@ -15,14 +20,6 @@
     {
       "source": "/cards",
       "destination": "/api/cards"
-    },
-    {
-      "source": "/api/recent-mints",
-      "destination": "/api/recent-mints"
-    },
-    {
-      "source": "/api/test-mint",
-      "destination": "/api/test-mint"
     },
     {
       "source": "/",
