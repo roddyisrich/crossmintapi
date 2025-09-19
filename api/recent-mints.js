@@ -6,35 +6,25 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log('Trying to get recent mint activities...');
     const activities = getRecentMintActivities(20);
-    console.log('Activities found:', activities.length);
     
     const formattedActivities = activities.map(activity => ({
       id: `${activity.timestamp}-${activity.playerId}`,
       userId: activity.playerId,
       cardPulled: activity.cardMinted,
-      timestamp: activity.timestamp,
-      walletAddress: activity.walletAddress
+      timestamp: activity.timestamp
     }));
 
     res.status(200).json({
       success: true,
-      count: formattedActivities.length,
-      activities: formattedActivities,
-      debug: {
-        logFileExists: require('fs').existsSync('./logs/mint-activities.log'),
-        currentDir: process.cwd(),
-        logsDir: require('fs').existsSync('./logs')
-      }
+      activities: formattedActivities
     });
 
   } catch (error) {
-    console.error('Error fetching activities:', error);
+    console.error('Error:', error);
     res.status(500).json({ 
       error: 'Failed to fetch recent activities',
-      details: error.message,
-      stack: error.stack
+      details: error.message
     });
   }
 }
