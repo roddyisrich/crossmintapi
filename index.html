@@ -3,6 +3,17 @@
 <head>
     <title>Breakaway Rush - Official Trading Cards</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Solana Web3.js -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    
+    <!-- Anchor Framework -->
+    <script src="https://unpkg.com/@project-serum/anchor@latest/dist/browser/index.js"></script>
+    
+    <!-- Crossmint Wallet SDK -->
+    <script src="https://www.unpkg.com/@crossmint/client-sdk-base@latest/dist/index.js"></script>
+    <script src="https://www.unpkg.com/@crossmint/client-sdk-solana@latest/dist/index.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600&display=swap');
         
@@ -426,6 +437,22 @@
     </div>
 
     <script>
+        // Solana configuration and clients
+        const CROSSMINT_APP_ID = "d66b1070-f539-4314-9d5f-8f9916b0838b";
+        const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
+        
+        let crossClient = null;
+        try {
+            if (window.CrossmintSDK && window.CrossmintSDK.embedded) {
+                crossClient = window.CrossmintSDK.embedded.solana({
+                    clientId: CROSSMINT_APP_ID,
+                    environment: "production"
+                });
+            }
+        } catch (error) {
+            console.log('Crossmint SDK not ready yet:', error);
+        }
+
         let currentUser = null;
         let currentWallet = null;
         let pendingDestination = null;
@@ -464,7 +491,7 @@
             document.getElementById(`${tab}-form`).classList.add('active');
         }
 
-        // Web2 Authentication
+        // Web2 Authentication via Crossmint
         async function loginWeb2() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
@@ -475,25 +502,26 @@
             }
 
             try {
-                const user = await simulateWeb2Login(email, password);
+                const wallet = await crossClient.getOrCreateWallet();
+                const walletAddress = wallet.address;
                 
-                if (user) {
-                    currentUser = user;
-                    currentWallet = user.walletAddress;
-                    
-                    // Store session
-                    sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    sessionStorage.setItem('currentWallet', currentWallet);
-                    
-                    // Update UI and navigate
-                    updateUserStatus();
-                    closeAuthModal();
-                    
-                    if (pendingDestination) {
-                        window.location.href = pendingDestination;
-                    }
-                } else {
-                    alert('Invalid credentials');
+                currentUser = {
+                    type: 'web2',
+                    email: email,
+                    walletAddress: walletAddress
+                };
+                currentWallet = walletAddress;
+                
+                // Store session
+                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                sessionStorage.setItem('currentWallet', currentWallet);
+                
+                // Update UI and navigate
+                updateUserStatus();
+                closeAuthModal();
+                
+                if (pendingDestination) {
+                    window.location.href = pendingDestination;
                 }
             } catch (error) {
                 console.error('Login error:', error);
@@ -502,73 +530,40 @@
         }
 
         async function registerWeb2() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            if (!email || !password) {
-                alert('Please enter email and password');
-                return;
-            }
+            // Same flow as login for Crossmint
+            await loginWeb2();
+        }
 
+        // Web3 Wallet Connection (Phantom only)
+        async function connectWallet() {
             try {
-                const user = await simulateWeb2Registration(email, password);
-                
-                if (user) {
-                    currentUser = user;
-                    currentWallet = user.walletAddress;
+                if (window.solana && window.solana.isPhantom) {
+                    const response = await window.solana.connect();
+                    const publicKey = response.publicKey.toString();
+                    
+                    currentWallet = publicKey;
+                    currentUser = { 
+                        type: 'web3', 
+                        walletAddress: currentWallet 
+                    };
                     
                     // Store session
                     sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
                     sessionStorage.setItem('currentWallet', currentWallet);
                     
-                    // Update UI and navigate
-                    updateUserStatus();
-                    closeAuthModal();
-                    alert('Account created successfully!');
+                    document.getElementById('wallet-address').textContent = publicKey;
+                    document.getElementById('wallet-status').classList.add('connected');
                     
-                    if (pendingDestination) {
-                        window.location.href = pendingDestination;
-                    }
-                }
-            } catch (error) {
-                console.error('Registration error:', error);
-                alert('Registration failed. Please try again.');
-            }
-        }
-
-        // Web3 Wallet Connection
-        async function connectWallet() {
-            try {
-                if (typeof window.ethereum !== 'undefined') {
-                    const accounts = await window.ethereum.request({
-                        method: 'eth_requestAccounts'
-                    });
-                    
-                    if (accounts.length > 0) {
-                        currentWallet = accounts[0];
-                        currentUser = { 
-                            type: 'web3', 
-                            walletAddress: currentWallet 
-                        };
+                    setTimeout(() => {
+                        updateUserStatus();
+                        closeAuthModal();
                         
-                        // Store session
-                        sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
-                        sessionStorage.setItem('currentWallet', currentWallet);
-                        
-                        document.getElementById('wallet-address').textContent = currentWallet;
-                        document.getElementById('wallet-status').classList.add('connected');
-                        
-                        setTimeout(() => {
-                            updateUserStatus();
-                            closeAuthModal();
-                            
-                            if (pendingDestination) {
-                                window.location.href = pendingDestination;
-                            }
-                        }, 2000);
-                    }
+                        if (pendingDestination) {
+                            window.location.href = pendingDestination;
+                        }
+                    }, 2000);
                 } else {
-                    alert('Please install MetaMask or another Web3 wallet');
+                    alert('Please install Phantom Wallet');
                 }
             } catch (error) {
                 console.error('Wallet connection error:', error);
@@ -606,39 +601,6 @@
             document.getElementById('wallet-status').classList.remove('connected');
         }
 
-        // Mock authentication functions
-        async function simulateWeb2Login(username, password) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            const mockUsers = {
-                'player1': {
-                    type: 'web2',
-                    username: 'player1',
-                    crossmintUserId: 'cm_user_123abc',
-                    walletAddress: '0x1234567890123456789012345678901234567890'
-                },
-                'testuser': {
-                    type: 'web2',
-                    username: 'testuser',
-                    crossmintUserId: 'cm_user_456def',
-                    walletAddress: '0x9876543210987654321098765432109876543210'
-                }
-            };
-            
-            return mockUsers[username] || null;
-        }
-
-        async function simulateWeb2Registration(username, password) {
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            
-            return {
-                type: 'web2',
-                username: username,
-                crossmintUserId: 'cm_user_new123',
-                walletAddress: '0x' + Math.random().toString(16).substr(2, 40)
-            };
-        }
-
         // Check for existing session on page load
         window.addEventListener('load', function() {
             const savedUser = sessionStorage.getItem('currentUser');
@@ -659,4 +621,4 @@
         });
     </script>
 </body>
-</html>
+</html
