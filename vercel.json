@@ -5,7 +5,21 @@
     }
   },
   "rewrites": [
-    { "source": "/cards", "destination": "/cards.html" },
-    { "source": "/dfs", "destination": "/dfs.html" }
+    {
+      "source": "/pack-opener",
+      "destination": "/pack-opener.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin.html"
+    },
+    {
+      "source": "/dfs",
+      "destination": "/dfs.html"
+    },
+    {
+      "source": "/cards",
+      "destination": "/cards.html"
+    }
   ]
 }
